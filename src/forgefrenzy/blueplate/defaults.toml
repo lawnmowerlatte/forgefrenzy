@@ -1,0 +1,37 @@
+[tools.blueplate]
+
+
+[tools.blueplate.options]
+[tools.blueplate.options.log]
+help = "enable logging to file"
+action = "store_true"
+
+[tools.blueplate.options.console]
+alternates = ["-v"]
+help = "show logging in console"
+action = "store_true"
+
+[tools.blueplate.options.debug]
+alternates = ["-vv"]
+help = "enable debug logging"
+action = "store_true"
+
+[tools.blueplate.options.debugv]
+alternates = ["-vvv"]
+help = "enable verbose debug logging"
+action = "store_true"
+
+[tools.blueplate.options.test]
+help = "run doctests"
+action = "store_true"
+
+[tools.blueplate.options.version]
+help = "show the current version"
+action = "store_true"
+
+[tools.blueplate.errors]
+unknown-error = "The error key {key} is undefined."
+bad-args = "Arguments provided were invalid: {e}"
+test-failure = "DocTest exectution failed due to test failure"
+test-error = "DocTest exectution failed due to exception during execution"
+

@@ -1,0 +1,6 @@
+.idea
+.venv
+.git
+terraform/.terraform
+terraform/.terraform.lock.hcl
+*.sqlite

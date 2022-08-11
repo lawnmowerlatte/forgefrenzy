@@ -1,0 +1,65 @@
+[tool.black]
+line-length = 100
+include = '\.pyi?$'
+extend-exclude = '''
+^/.venv/.*
+'''
+
+
+[tools.blueplate.options.lawnmowerlatte]
+
+[tools.blueplate.options.refresh-all-data]
+help = "refresh data for all product handles"
+action = "store_true"
+
+# [tools.blueplate.options.list]
+# alternates = "['-l']"
+# help = "list all product handles"
+# action = "store_true"
+
+# [tools.blueplate.options.set]
+# alternates = "['-s']"
+# help = "show a specific set, can accept multiple"
+# nargs = "+"
+#
+# [tools.blueplate.options.scan]
+# alternates = "['-x']"
+# help = "scan a given set for available inventory"
+#
+# [tools.blueplate.options.clear]
+# alternates = "['-c']"
+# help = "clear the inventory cache"
+# #
+# [tools.blueplate.options.filter]
+# alternates = "['-f']"
+# help = "filter list of product handles with regex"
+#
+# [tools.blueplate.options.available]
+# alternates = "['-a']"
+# help = "refresh data for all product handles"
+# action = "store_true"
+#
+# [tools.blueplate.options.painted]
+# alternates = "['-p']"
+# help = "filter by painted"
+# action = "store_true"
+#
+# [tools.blueplate.options.unpainted]
+# alternates = "['-u']"
+# help = "filter by unpainted"
+# action = "store_true"
+#
+# [tools.blueplate.options.tag]
+# help = "filter by tag"
+# nargs = "+"
+#
+# [tools.blueplate.options.show-tags]
+# help = "list all tags"
+# action = "store_true"
+#
+# [tools.blueplate.options.order]
+# alternates = "['-o']"
+# help = "automatically order the set"
+# action = "store_true"
+
+[tools.blueplate.errors]
