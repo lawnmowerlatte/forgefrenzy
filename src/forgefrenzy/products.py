@@ -56,11 +56,12 @@ class Product(DatabaseEntry, EntryORM):
         return Sets.primary(sku)
 
     @property
+    def partlists(self):
+        return [part for part in self.set.partlist]
+
+    @property
     def pieces(self):
-        return [
-            {"piece": part.piece, "quantity": part.quantity}
-            for part in self.set.partlist
-        ]
+        return [part.piece for part in self.set.partlist]
 
     @property
     def refreshable(self):
@@ -211,6 +212,14 @@ class Set(DatabaseEntry, EntryORM):
     def partlist(self):
         return PartLists.filter(PartList.set == self.sku).all()
 
+    @property
+    def products(self):
+        return Products.filter(Product.sku.startswith(self.sku)).all()
+
+    @property
+    def pieces(self):
+        return [part.piece for part in self.partlist]
+
 
 class Sets(DatabaseTable):
     orm = Set
@@ -302,6 +311,19 @@ class Piece(DatabaseEntry, EntryORM):
     img = Column(String)
     tagstring = Column(String)
 
+    @property
+    def partlist(self):
+        return PartLists.filter(PartList.piece == self.sku).all()
+
+    @property
+    def sets(self):
+        return [part.set for part in self.partlist]
+
+    @property
+    def products(self):
+        return [product
+                for products_in_set in self.sets
+                for product in products_in_set]
 
 class Pieces(DatabaseTable):
     orm = Piece
