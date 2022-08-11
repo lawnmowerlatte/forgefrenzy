@@ -51,9 +51,18 @@ class Product(DatabaseEntry, EntryORM):
     def set(self):
         sku = self.sku
         if sku.endswith("-U") or sku.endswith("-P"):
-            sku = sku[:-3]
+            sku = sku[:-2]
 
-        return Set.primary(sku)
+        return Sets.primary(sku)
+
+    @property
+    def pieces(self):
+        partlists = self.set.partlist
+
+        return [
+            (part.piece, part.quantity)
+            for part in partlists
+        ]
 
     @property
     def refreshable(self):
@@ -200,6 +209,10 @@ class Set(DatabaseEntry, EntryORM):
     img = Column(String)
     tagstring = Column(String)
 
+    @property
+    def partlist(self):
+        return PartLists.filter(PartList.set == self.sku).all()
+
 
 class Sets(DatabaseTable):
     orm = Set
@@ -240,7 +253,6 @@ class PartList(DatabaseEntry, EntryORM):
     id = Column(Integer, primary_key=True)
     set = Column(String, ForeignKey("set.sku"))
     piece = Column(String, ForeignKey("pieces.sku"))
-
     quantity = Column(Integer)
 
     def __repr__(self):

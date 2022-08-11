@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 import logging
 
 from sqlalchemy import create_engine
@@ -15,14 +15,15 @@ EntryORM = declarative_base()
 
 
 class DFDB:
-    def __init__(self, database=None, root=None, echo=False):
-        self.root = root or os.getcwd()
+    def __init__(self, volatile=False, echo=False):
+        root = Path(__file__).parent
+        database = root / "df.sqlite"
 
-        if database is None:
+        if volatile:
             log.warning("Starting database in volatile memory")
             self.db = "sqlite:///:memory:"
         else:
-            self.db = f"sqlite:///{self.root}/{database}"
+            self.db = f"sqlite:///{database}"
 
         self.engine = create_engine(self.db, echo=echo)
 
@@ -40,7 +41,7 @@ class DFDB:
         return DatabaseSession(self)
 
 
-dfdb = DFDB("df.sqlite")
+dfdb = DFDB()
 
 
 class DatabaseSession:
@@ -203,51 +204,58 @@ class DatabaseTable:
         if issubclass(self.orm, EntryORM):
             self.db.generate_table(self.orm)
 
-    @property
-    def session(self):
-        return DatabaseSession(self.db)
+    def __str__(self):
+        return f"{self.__class__.__name__}[{self.orm.__name__}]"
 
     def __repr__(self):
         return f"{self.__class__.__name__}[{self.orm.__name__}]"
 
-    def __str__(self):
-        return f"{self.__class__.__name__}[{self.orm.__name__}]"
+    @classmethod
+    def session(cls):
+        return DatabaseSession(cls.db).session
 
-    def query(self):
+    @classmethod
+    def query(cls):
         """Return a query for this table with an open session"""
-        return self.session.session.query(self.orm)
+        return cls.session().query(cls.orm)
 
-    def primary(self, value):
+    @classmethod
+    def primary(cls, value):
         """Returns the database entry based on the given primary key"""
-        return self.query().get(value)
+        return cls.query().get(value)
 
-    def all(self):
+    @classmethod
+    def all(cls):
         """Returns a list of all objects"""
-        return self.query().all()
+        return cls.query().all()
 
-    def keys(self):
+    @classmethod
+    def keys(cls):
         """Returns a list of all primary keys"""
-        return [entry.primary for entry in self.all()]
+        return [entry.primary for entry in cls.all()]
 
-    def keyed(self):
+    @classmethod
+    def keyed(cls):
         """Returns a dictionary of all objects, keyed on the primary key"""
-        return {entry.primary: entry for entry in self.all()}
+        return {entry.primary: entry for entry in cls.all()}
 
-    def filter(self, *args, **kwargs):
+    @classmethod
+    def filter(cls, *args, **kwargs):
         """Filter the table and return the results on an open session"""
-        return self.query().filter(*args, **kwargs)
+        return cls.query().filter(*args, **kwargs)
 
-    def tagged(self, *tag_list):
+    @classmethod
+    def tagged(cls, *tag_list):
         """
         Filter the table using tags. Each entry in tag list is a string containing one or more
         tags. Tags may be comma separated and may be negated by prepending a dash. Entries must
         match at one or more of the tag lists specified.
         """
-        if self.orm.tagstring is None:
-            raise DatabaseEntryMissingColumnError(self.orm, "tagstring")
+        if cls.orm.tagstring is None:
+            raise DatabaseEntryMissingColumnError(cls.orm, "tagstring")
 
         matches = set()
-        entries = self.query()
+        entries = cls.query()
 
         for tags in tag_list:
             if isinstance(tag, str):
@@ -256,11 +264,11 @@ class DatabaseTable:
             for tag in tags:
                 if tag[0] == "-":
                     tag = tag[1:]
-                    entries = entries.filter(not self.orm.tagstring.contains(tag))
+                    entries = entries.filter(not cls.orm.tagstring.contains(tag))
                 else:
-                    entries = entries.filter(self.orm.tagstring.contains(tag))
+                    entries = entries.filter(cls.orm.tagstring.contains(tag))
 
             matches.add(entries)
-            entries = self.query()
+            entries = cls.query()
 
         return matches

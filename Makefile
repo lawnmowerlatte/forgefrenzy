@@ -14,7 +14,7 @@ VENV_BIN = $(VENV_PATH)/bin
 ACTIVATE = $(VENV_BIN)/activate
 
 .PHONY: all
-all: pip deploy
+all: pip
 localdev: hooks test build
 pip: hooks test VERSION build upload install
 deploy: hooks test build lambda terraform
@@ -146,7 +146,7 @@ upload: | .pypirc
 	@ln ~/.pypirc .pypirc
 
 install: $(PYTHON_PATH)/pip3
-	@while [ $(PIP3) install $(PROJECT)==$(VERSION) ]; do sleep 5; done
+	@while ! $(shell dirname $(shell readlink $(VENV_BIN)/$(PYTHON3)))/$(PIP3) install $(PROJECT)==$(VERSION); do sleep 5; done
 
 # Global Python checks
 

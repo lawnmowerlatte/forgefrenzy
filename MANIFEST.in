@@ -1,7 +1,9 @@
-include src/forgefrenzy
-include src/forgefrenzy/blueplate
+include src/forgefrenzy/df.sqlite
+include src/forgefrenzy/blueplate/defaults.toml
 include setup.cfg
 include README.md
 include pyproject.toml
 include VERSION
 include LICENSE
+include requirements.txt
+include requirements.dev.txt

@@ -180,7 +180,6 @@ class Special:
           debugv            True
           test              False
           version           False
-        ...
         """
         output = ["arguments:"]
 
