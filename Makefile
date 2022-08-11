@@ -86,11 +86,10 @@ build: VERSION
 build: dist/forgefrenzy-$(VERSION).tar.gz
 
 .PHONY: run
+run: ARGS ?= "-vv"
 run:
-	@printf "$(PYTHON3) -m $(PROJECT) "
-	@read ARGS
-	@echo "Args: ${ARGS}"
-	@. $(ACTIVATE) && PYTHONPATH=src $(PYTHON3) -m $(PROJECT) -vv $(ARGS)
+	@echo "$(PYTHON3) -m $(PROJECT) $(ARGS)"
+	@. $(ACTIVATE) && PYTHONPATH=src $(PYTHON3) -m $(PROJECT) $(ARGS)
 
 $(SOURCES):
 	echo "Sources have changed..."
