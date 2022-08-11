@@ -1,0 +1,26 @@
+Metadata-Version: 2.1
+Name: forgefrenzy
+Version: 0.1.22
+Summary: A collection of tools to nurture your addiction to Dwarven Forge
+Home-page: https://github.com/lawnmowerlatte/forgefrenzy
+Author: lawnmowerlatte
+Author-email: lawnmowerlatte@gmail.com
+Project-URL: Bug Tracker, https://github.com/lawnmowerlatte/forgefrenzy/issues
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Provides-Extra: dev
+License-File: LICENSE
+
+# forgefrenzy
+A collection of tools to nurture your addiction to Dwarven Forge
+
+[![License](https://img.shields.io/pypi/l/forgefrenzy)](https://pypi.org/project/forgefrenzy/)[![Github license](https://img.shields.io/github/license/lawnmowerlatteforgefrenzy.svg "License")](https://github.com/lawnmowerlatteforgefrenzy/blob/master/LICENSE)
+
+[![Open issues](https://img.shields.io/github/issues/lawnmowerlatteforgefrenzy.svg "Open issues")](https://github.com/lawnmowerlatteforgefrenzy/issues)
+[![Closed issues](https://img.shields.io/github/issues-closed/lawnmowerlatteforgefrenzy.svg "Closed issues")](https://github.com/lawnmowerlatteforgefrenzy/issues?utf8=✓&q=is%3Aissue+is%3Aclosed)
+
+[![Open Pull Requests](https://img.shields.io/github/issues-pr/lawnmowerlatteforgefrenzy.svg "Open Pull Requests")](https://github.com/lawnmowerlatteforgefrenzy/pulls)
+[![Closed Pull Requests](https://img.shields.io/github/issues-pr-closed/lawnmowerlatteforgefrenzy.svg "Closed Pull Requests")](https://github.com/lawnmowerlatteforgefrenzy/pulls?utf8=✓&q=is%3Apr+is%3Aclosed)

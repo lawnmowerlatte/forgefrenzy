@@ -1,0 +1,15 @@
+minimock
+requests
+selenium
+sqlalchemy
+beautifulsoup4
+
+[:python_version < "3.11"]
+tomli>=1.1.0
+
+[dev]
+black
+build
+minimock
+semver
+twine
