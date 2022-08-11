@@ -57,7 +57,10 @@ class Product(DatabaseEntry, EntryORM):
 
     @property
     def pieces(self):
-        return {{"piece": part.piece, "quantity": part.quantity} for part in self.set.partlist}
+        return [
+            {"piece": part.piece, "quantity": part.quantity}
+            for part in self.set.partlist
+        ]
 
     @property
     def refreshable(self):
