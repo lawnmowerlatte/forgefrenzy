@@ -61,7 +61,8 @@ class Product(DatabaseEntry, EntryORM):
 
     @property
     def pieces(self):
-        return [part.piece for part in self.set.partlist]
+        pieces = [part.piece for part in self.partlists]
+        return Pieces.filter_many(Piece.sku, pieces)
 
     @property
     def refreshable(self):
@@ -209,7 +210,7 @@ class Set(DatabaseEntry, EntryORM):
     tagstring = Column(String)
 
     @property
-    def partlist(self):
+    def partlists(self):
         return PartLists.filter(PartList.set == self.sku).all()
 
     @property
@@ -218,7 +219,8 @@ class Set(DatabaseEntry, EntryORM):
 
     @property
     def pieces(self):
-        return [part.piece for part in self.partlist]
+        pieces = [part.piece for part in self.partlist]
+        return Pieces.filter_many(Piece.sku, pieces)
 
 
 class Sets(DatabaseTable):
@@ -317,11 +319,16 @@ class Piece(DatabaseEntry, EntryORM):
 
     @property
     def sets(self):
-        return [part.set for part in self.partlist]
+        sets = [part.set for part in self.partlist]
+        return Sets.filter_many(Set.sku, sets)
 
     @property
     def products(self):
-        return [product for products_in_set in self.sets for product in products_in_set]
+        products = []
+        for set in self.sets:
+            products.extend(set.products)
+
+        return products
 
 
 class Pieces(DatabaseTable):

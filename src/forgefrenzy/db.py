@@ -245,6 +245,16 @@ class DatabaseTable:
         return cls.query().filter(*args, **kwargs)
 
     @classmethod
+    def filter_many(cls, field, values):
+        """Filter based on a list of valid values"""
+        results = []
+        for value in values:
+            result = cls.filter(field == value).all()
+            results.extend(result)
+
+        return results
+
+    @classmethod
     def tagged(cls, *tag_list):
         """
         Filter the table using tags. Each entry in tag list is a string containing one or more
