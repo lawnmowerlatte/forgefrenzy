@@ -321,9 +321,8 @@ class Piece(DatabaseEntry, EntryORM):
 
     @property
     def products(self):
-        return [product
-                for products_in_set in self.sets
-                for product in products_in_set]
+        return [product for products_in_set in self.sets for product in products_in_set]
+
 
 class Pieces(DatabaseTable):
     orm = Piece
