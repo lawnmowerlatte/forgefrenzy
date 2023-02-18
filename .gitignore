@@ -1,7 +1,11 @@
 .idea
 .venv
 .git
+dist
 terraform/.terraform
 terraform/.terraform.lock.hcl
+terraform/data
+terraform/certificates
 *.sqlite
 .pypirc
+src/*.egg-info
