@@ -106,6 +106,8 @@ class Webstore(WebResource):
 class Catalog(WebResource):
     base_url = "https://pieces.dwarvenforge.com"
     request_cooldown = 0.5
+    set_url_regex = f"href=['\"]{base_url}/item/1/([^'\"]+)['\"]"
+    piece_url_regex = f"href=['\"]{base_url}/item/2/([^'\"]+)['\"]"
 
     @classmethod
     def get_data(cls):
@@ -118,3 +120,15 @@ class Catalog(WebResource):
             raise CatalogResourceError(f"Failed to get JSON from Catalog inline page data") from e
 
         return as_json
+
+    @classmethod
+    def get_pieces_in_set(cls, sku):
+        response = cls.get(f"item/1/{sku}")
+        pieces_from_page = re.findall(cls.piece_url_regex, response.text)
+        return pieces_from_page
+
+    @classmethod
+    def get_sets_with_piece(cls, sku):
+        response = cls.get(f"item/2/{sku}")
+        sets_from_page = re.findall(cls.set_url_regex, response.text)
+        return sets_from_page

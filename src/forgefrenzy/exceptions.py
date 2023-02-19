@@ -2,7 +2,15 @@ class DatabaseAccessError(Exception):
     pass
 
 
-class DatabaseEntrySpecificationError(Exception):
+class DatabaseConnectionError(DatabaseAccessError):
+    pass
+
+
+class DynamoDBConnectionError(DatabaseConnectionError):
+    pass
+
+
+class DatabaseEntrySpecificationError(DatabaseAccessError):
     def __init__(self, message):
         self.message = message
 
@@ -10,7 +18,7 @@ class DatabaseEntrySpecificationError(Exception):
         return f"{self.__class__.__name__}: {self.message}"
 
 
-class DatabaseEntryMissingColumnError(Exception):
+class DatabaseEntryMissingColumnError(DatabaseAccessError):
     def __init__(self, cls, column):
         self.cls = cls
         self.column = column

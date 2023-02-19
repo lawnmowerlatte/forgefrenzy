@@ -41,6 +41,8 @@ class Product(DatabaseEntry, EntryORM):
             self.updated = datetime.now()
             self.save()
 
+            point = Point(self.sku, self.quantity, self.updated)
+
     def save(self):
         if self.updated is None:
             self.updated = datetime.now()
@@ -219,7 +221,7 @@ class Set(DatabaseEntry, EntryORM):
 
     @property
     def pieces(self):
-        pieces = [part.piece for part in self.partlist]
+        pieces = [part.piece for part in self.partlists]
         return Pieces.filter_many(Piece.sku, pieces)
 
 
@@ -361,3 +363,93 @@ class Pieces(DatabaseTable):
             new_piece.save()
 
         return pieces
+
+
+class Point(DatabaseEntry, EntryORM):
+    """An individual data point corresponding to an amount of inventory at a given time"""
+
+    __tablename__ = "stock"
+    __primary__ = "id"
+
+    default_dataset = "main"
+    dataset = Column(String, default=default_dataset)
+    id = Column(Integer, primary_key=True)
+    sku = Column(String)
+    quantity = Column(Integer)
+    timestamp = Column(DateTime, server_default=func.now())
+    redundant = Column(Boolean)
+
+    def __init__(self, sku, quantity, timestamp=None):
+        self.sku = sku
+        self.quantity = quantity
+        self.timestamp = timestamp or datetime.now()
+        self.redundant = False
+
+        self.save()
+
+    def __str__(self):
+        return f"{self.__class__.__name__} <{self.sku}@{self.timestamp}>"
+
+
+class Stock(DatabaseTable):
+    orm = Point
+
+    @classmethod
+    def series(cls, *args, **kwargs):
+        products = Products.filter(*args, **kwargs)
+        skus = [product.sku for product in products]
+        series = [Series(sku) for sku in skus]
+        return series
+
+
+class Series(DatabaseTable):
+    orm = Point
+
+    def __init__(self, sku):
+        self.sku = sku
+
+        super().__init__()
+
+    def query(self):
+        """Override the class method with an object specific one that filters the table by the object's SKU"""
+        return (
+            self.session()
+            .query(self.orm)
+            .filter(Point.sku == self.sku)
+            .order_by(Point.timestamp.asc())
+        )
+
+    def all(self):
+        return Series.all(self)
+
+    @property
+    def history(self):
+        return self.all()
+
+    def clean(self):
+        points = self.history
+        current = None
+
+        for index, point in enumerate(points):
+            # Try to find the next data point
+            try:
+                next = points[index + 1]
+            except IndexError:
+                # If we are on the last item, it's automatically important
+                log.warning(f"{point} at index {index} is the last item")
+                continue
+
+            if current is None or point.quantity != current:
+                # If the quantity changed, set the new reference point
+                log.info(f"{point} is different from the preceding series")
+                current = point.quantity
+
+            elif point.quantity != next.quantity:
+                # If the quantity didn't change, but it's the last in the series, keep it
+                log.info(f"{point} is the last in the series")
+
+            else:
+                # If the quantity hasn't changed and it isn't the last in the series, mark it as redudnant
+                log.info(f"{point} is a mid-series value, marking as redundant")
+                point.redundant = True
+                point.save()

@@ -4,3 +4,4 @@ requests
 selenium
 sqlalchemy
 beautifulsoup4
+debuglater[all]

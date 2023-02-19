@@ -2,8 +2,8 @@
 resource "aws_dynamodb_table" "ff_products_table" {
   name = "ff-products-table"
   billing_mode = "PROVISIONED"
-  read_capacity= "30"
-  write_capacity= "30"
+  read_capacity= "1"
+  write_capacity= "1"
   attribute {
     name = "handle"
     type = "S"
@@ -14,8 +14,8 @@ resource "aws_dynamodb_table" "ff_products_table" {
 resource "aws_dynamodb_table" "ff_sets_table" {
   name = "ff-sets-table"
   billing_mode = "PROVISIONED"
-  read_capacity= "30"
-  write_capacity= "30"
+  read_capacity= "1"
+  write_capacity= "1"
   attribute {
     name = "sku"
     type = "S"
@@ -26,8 +26,8 @@ resource "aws_dynamodb_table" "ff_sets_table" {
 resource "aws_dynamodb_table" "ff_pieces_table" {
   name = "ff-pieces-table"
   billing_mode = "PROVISIONED"
-  read_capacity= "30"
-  write_capacity= "30"
+  read_capacity= "1"
+  write_capacity= "1"
   attribute {
     name = "sku"
     type = "S"
@@ -38,8 +38,8 @@ resource "aws_dynamodb_table" "ff_pieces_table" {
 resource "aws_dynamodb_table" "ff_partlist_table" {
   name = "ff-partlist-table"
   billing_mode = "PROVISIONED"
-  read_capacity= "30"
-  write_capacity= "30"
+  read_capacity= "1"
+  write_capacity= "1"
   attribute {
     name = "sku"
     type = "S"

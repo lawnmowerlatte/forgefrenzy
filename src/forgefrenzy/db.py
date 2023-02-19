@@ -1,3 +1,4 @@
+import os.path
 from pathlib import Path
 import logging
 
@@ -5,32 +6,32 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.exc import OperationalError
+from debuglater import patch_ipython
+
 
 from forgefrenzy.exceptions import *
 from forgefrenzy.blueplate.logger import log
+
+try:
+    import tomllib
+except ModuleNotFoundError:
+    import tomli as tomllib
 
 logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
 
 EntryORM = declarative_base()
 
 
-class DFDB:
-    def __init__(self, volatile=False, echo=False):
-        root = Path(__file__).parent
-        database = root / "df.sqlite"
+class ForgeFrenzyDatabase:
+    db = "sqlite:///:memory:"
 
-        if volatile:
-            log.warning("Starting database in volatile memory")
-            self.db = "sqlite:///:memory:"
-        else:
-            self.db = f"sqlite:///{database}"
-
+    def __init__(self, echo=False):
+        log.warning("Starting database in volatile memory")
         self.engine = create_engine(self.db, echo=echo)
-
         self.Session = sessionmaker(bind=self.engine)
 
     def __str__(self):
-        return f"DFDB at <{self.db}>"
+        return f"{self.__class__.__name__} at <{self.db}>"
 
     def generate_table(self, table_class):
         table_class.metadata.create_all(self.engine)
@@ -41,7 +42,55 @@ class DFDB:
         return DatabaseSession(self)
 
 
-dfdb = DFDB()
+class ForgeFrenzyLocalDB(ForgeFrenzyDatabase):
+    db = "sqlite:///{database}"
+
+    def __init__(self, database_file=None, echo=False):
+        if database_file is None:
+            library_path = Path(__file__).parent
+            database_file = library_path / "df.sqlite"
+
+        self.db = self.db.format(database=database_file)
+
+        super().__init__(echo)
+
+
+class ForgeFrenzyDynamoDB(ForgeFrenzyDatabase):
+    db = "amazondynamodb:///?Access Key={access_key}&Secret Key={secret_key}&Domain=amazonaws.com&Region={aws_region}"
+
+    def __init__(
+        self,
+        aws_region="us-east-1",
+        credentials_file="~/.aws/credentials",
+        credentials_section="default",
+        echo=False,
+    ):
+        credentials_file = os.path.expanduser(credentials_file)
+
+        try:
+            with open(credentials_file, "rb") as f:
+                aws_credentials = tomllib.load(f).get(credentials_section, {})
+        except Exception as e:
+            log.error("Unable to load credentials file as TOML")
+            raise DynamoDBConnectionError("Unable to load credentials file as TOML") from e
+
+        try:
+            access_key = aws_credentials["aws_access_key_id"]
+            secret_key = aws_credentials["aws_secret_access_key"]
+        except KeyError as e:
+            log.error(f"Unable to find valid AWS credentials in {credentials_file}")
+            raise DynamoDBConnectionError("Unable to find valid AWS credentials") from e
+
+        self.db = self.db.format(
+            access_key=access_key, secret_key=secret_key, aws_region=aws_region
+        )
+
+        super().__init__(echo)
+
+
+# dfdb = ForgeFrenzyDatabase()
+dfdb = ForgeFrenzyLocalDB()
+# dfdb = ForgeFrenzyDynamoDB()
 
 
 class DatabaseSession:
